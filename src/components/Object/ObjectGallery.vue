@@ -124,12 +124,16 @@ const generateObjects = () => {
 }
 
 const tick = () => {
+  const { bounds, speed } = props
+
   objects.value.forEach((object) => {
-    object.position.y -= 0.08 * object.speed * props.speed
+    object.position.y -= 0.08 * object.speed * speed
 
     // snap to bounds
-    if (object.position.y < -props.bounds.y / 2) {
-      object.position.y = props.bounds.y / 2
+    if (object.position.y < -bounds.y / 2) {
+      object.position.y = bounds.y / 2
+      object.position.x = random() * bounds.x - bounds.x / 2
+      object.position.z = random() * bounds.z - bounds.z / 2
     }
   })
 }
