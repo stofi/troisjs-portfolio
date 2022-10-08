@@ -2,6 +2,8 @@
   <Plane
     v-for="object in objects"
     :key="object.id"
+    receive-shadow
+    cast-shadow
     :position="object.position"
     :width="object.scale"
     :height="object.scale * object.aspect"
@@ -9,9 +11,16 @@
     :height-segments="1"
     :rotation="object.rotation"
   >
-    <BasicMaterial color="#ffffff">
+    <PhysicalMaterial
+      color="#ffffff"
+      :props="{
+        roughness: 0.9,
+        clearcoat: 0.02,
+        clearcoatRoughness: 0.2,
+      }"
+    >
       <Texture :src="object.src" />
-    </BasicMaterial>
+    </PhysicalMaterial>
   </Plane>
 </template>
 
@@ -19,7 +28,7 @@
 import { computed, defineProps, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { Vector3 } from 'three'
-import { BasicMaterial, Plane, Texture } from 'troisjs'
+import { PhysicalMaterial, Plane, Texture } from 'troisjs'
 
 import { random, seedRandom } from '@/utils'
 
@@ -86,7 +95,7 @@ const mapImagesFromGallery = (gallery: Gallery) => {
       src: image.image,
       aspect,
       scale: 10,
-      speed: random() + 0.5,
+      speed: 0.5,
     }
   })
 }

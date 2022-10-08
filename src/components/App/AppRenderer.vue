@@ -5,17 +5,22 @@
     alpha
     resize="window"
     antialias
+    shadow
     :orbit-ctrl="{
       enableDamping: true,
       dampingFactor: 0.05,
       enableRotate: false,
-      enablePan: false,
-      enableZoom: false,
     }"
   >
-    <Camera ref="cameraRef" :position="{ x: 0, y: 0, z: 60 }" />
+    <Camera ref="cameraRef" :position="{ x: 0, y: 0, z: 50 }" />
 
     <Scene ref="sceneRef">
+      <DirectionalLight
+        cast-shadow
+        :position="{ x: 20, y: 20, z: 60 }"
+        :intensity="1"
+        :shadow-map-size="{ width: 1024, height: 1024 }"
+      />
       <slot></slot>
     </Scene>
     <EffectComposer>
@@ -31,9 +36,9 @@ import { computed } from 'vue'
 
 import {
   Camera,
+  DirectionalLight,
   EffectComposer,
   FilmPass,
-  PointLight,
   Renderer,
   RenderPass,
   Scene,
