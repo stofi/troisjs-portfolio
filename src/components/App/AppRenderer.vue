@@ -9,9 +9,11 @@
       enableDamping: true,
       dampingFactor: 0.05,
       enableRotate: false,
+      enablePan: false,
+      enableZoom: false,
     }"
   >
-    <Camera ref="cameraRef" :position="{ x: 0, y: 0, z: 100 }" />
+    <Camera ref="cameraRef" :position="{ x: 0, y: 0, z: 60 }" />
 
     <Scene ref="sceneRef">
       <slot></slot>

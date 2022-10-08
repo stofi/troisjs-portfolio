@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineProps, onActivated, onMounted, ref } from 'vue'
+import { computed, defineProps, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { Vector3 } from 'three'
 import { BasicMaterial, Plane, Texture } from 'troisjs'
@@ -30,20 +30,75 @@ export interface GalleryItem {
   aspect: number
   src: string
   scale: number
+  speed: number
 }
 
 const props = defineProps<{
-  items: GalleryItem[]
   bounds: Vector3
-  seed: number | undefined
+  seed: number
+  speed: number
 }>()
 
 const objects = ref<GalleryItem[]>([])
 
+// const bounds = ref(new Vector3(1, 1, 1))
+// const radius = ref(1)
+const galleryModules = await import.meta.glob(
+  '@/../content/_posts/gallery/*.md'
+)
+
+interface Gallery {
+  attributes: {
+    layout: string
+    title: string
+    date: string
+    thumbnail: string
+    rating: number
+    images: {
+      image: string
+    }[]
+  }
+  html: string
+}
+
+const galleryFiles = await Promise.all(
+  Object.keys(galleryModules).map(
+    (key) => galleryModules[key]() as Promise<Gallery>
+  )
+)
+
+const mapImagesFromGallery = (gallery: Gallery) => {
+  return gallery.attributes.images.map(async (image) => {
+    const imageObject = new Image()
+    imageObject.src = image.image
+
+    await new Promise((resolve) => {
+      imageObject.onload = resolve
+    })
+
+    const { width, height } = imageObject
+    const aspect = height / width
+
+    return {
+      id: image.image,
+      rotation: new Vector3(0, 0, 0),
+      position: new Vector3(0, 0, 0),
+      src: image.image,
+      aspect,
+      scale: 10,
+      speed: random() + 0.5,
+    }
+  })
+}
+
+const items = galleryFiles.length
+  ? await Promise.all(mapImagesFromGallery(galleryFiles[0]))
+  : []
+
 const generateObjects = () => {
-  const { bounds, seed, items } = props
+  const { bounds, seed } = props
   const objects: GalleryItem[] = []
-  seedRandom(seed ?? 0)
+  seedRandom(seed)
 
   items.forEach((item) => {
     const x = random() * bounds.x - bounds.x / 2
@@ -56,12 +111,39 @@ const generateObjects = () => {
     })
   })
 
-  console.log('generated objects', objects)
-
   return objects
 }
 
+const tick = () => {
+  objects.value.forEach((object) => {
+    object.position.y -= 0.08 * object.speed * props.speed
+
+    // snap to bounds
+    if (object.position.y < -props.bounds.y / 2) {
+      object.position.y = props.bounds.y / 2
+    }
+  })
+}
+
+const interval = ref(0)
+
+const startInterval = () => {
+  interval.value = window.setInterval(() => {
+    tick()
+  }, 1000 / 60)
+}
+
+const stopInterval = () => {
+  window.clearInterval(interval.value)
+}
+
+objects.value = generateObjects()
+
 onMounted(() => {
-  objects.value = generateObjects()
+  startInterval()
+})
+
+onBeforeUnmount(() => {
+  stopInterval()
 })
 </script>
