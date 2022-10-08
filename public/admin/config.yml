@@ -1,6 +1,6 @@
 backend:
   name: github
-  branch: stofi/troisjs-portfolio
+  repo: stofi/troisjs-portfolio
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
 collections:
