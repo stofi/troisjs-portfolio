@@ -1,8 +1,10 @@
 <template>
   <KeepAlive>
-    <AppRenderer>
-      <router-view />
-    </AppRenderer>
+    <Suspense>
+      <AppRenderer>
+        <router-view />
+      </AppRenderer>
+    </Suspense>
   </KeepAlive>
 
   <!-- UI -->
