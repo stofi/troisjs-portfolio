@@ -5,7 +5,6 @@
     alpha
     resize="window"
     antialias
-    shadow
     :orbit-ctrl="{
       enableDamping: true,
       dampingFactor: 0.05,
@@ -15,12 +14,7 @@
     <Camera ref="cameraRef" :position="{ x: 0, y: 0, z: 50 }" />
 
     <Scene ref="sceneRef">
-      <DirectionalLight
-        cast-shadow
-        :position="{ x: 20, y: 20, z: 60 }"
-        :intensity="1"
-        :shadow-map-size="{ width: 1024, height: 1024 }"
-      />
+      <DirectionalLight :position="{ x: 20, y: 20, z: 60 }" :intensity="1" />
       <slot></slot>
     </Scene>
     <EffectComposer>

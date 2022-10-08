@@ -2,8 +2,6 @@
   <Plane
     v-for="object in objects"
     :key="object.id"
-    receive-shadow
-    cast-shadow
     :position="object.position"
     :width="object.scale"
     :height="object.scale * object.aspect"
@@ -17,6 +15,8 @@
         roughness: 0.9,
         clearcoat: 0.02,
         clearcoatRoughness: 0.2,
+        transparent: true,
+        opacity: object.opacity,
       }"
     >
       <Texture :src="object.src" />
@@ -30,7 +30,7 @@ import { computed, defineProps, onBeforeUnmount, onMounted, ref } from 'vue'
 import { Vector3 } from 'three'
 import { PhysicalMaterial, Plane, Texture } from 'troisjs'
 
-import { random, seedRandom } from '@/utils'
+import { map, random, seedRandom } from '@/utils'
 
 export interface GalleryItem {
   position: Vector3
@@ -40,6 +40,7 @@ export interface GalleryItem {
   src: string
   scale: number
   speed: number
+  opacity: number
 }
 
 const props = defineProps<{
@@ -96,6 +97,7 @@ const mapImagesFromGallery = (gallery: Gallery) => {
       aspect,
       scale: 10,
       speed: 0.5,
+      opacity: 0.1,
     }
   })
 }
@@ -135,6 +137,8 @@ const tick = () => {
       object.position.x = random() * bounds.x - bounds.x / 2
       object.position.z = random() * bounds.z - bounds.z / 2
     }
+    const absY = Math.abs(object.position.y) / (bounds.y / 2)
+    object.opacity = 1 - map(absY, 0.8, 1, 0, 1, true)
   })
 }
 
