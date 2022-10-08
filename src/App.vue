@@ -41,18 +41,20 @@
 </template>
 
 <script lang="ts" setup>
-import { onActivated } from 'vue'
+import { onActivated, onErrorCaptured } from 'vue'
+import { useRouter } from 'vue-router'
 
 import AppRenderer from '@/components/App/AppRenderer.vue'
 import InputButton from '@/components/Input/InputButton.vue'
 import InputRange from '@/components/Input/InputRange.vue'
 import useStore from '@/composables/useStore'
 
-console.log('App setup')
+const router = useRouter()
 
-onActivated(() => {
-  console.log('App activated')
+onErrorCaptured((error) => {
+  router.push('/')
 })
+
 const store = useStore()
 </script>
 

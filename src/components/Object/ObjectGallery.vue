@@ -31,7 +31,6 @@ import { Vector3 } from 'three'
 import { PhysicalMaterial, Plane, Texture } from 'troisjs'
 
 import useFaller from '@/composables/useFaller'
-import { map, random, seedRandom } from '@/utils'
 
 export interface GalleryItem {
   position: Vector3
@@ -62,16 +61,17 @@ const props = defineProps<{
   bounds: Vector3
   seed: number
   speed: number
-  galleryFiles: Gallery
+  scale: number
+  images: string[]
 }>()
 
 const { generateObjects, startInterval, stopInterval, objects } =
   useFaller<GalleryItem>(props)
 
-const mapImagesFromGallery = (gallery: Gallery) => {
-  return gallery.attributes.images.map(async (image) => {
+const mapImagesFromGallery = (images: string[]) => {
+  return images.map(async (image) => {
     const imageObject = new Image()
-    imageObject.src = image.image
+    imageObject.src = image
 
     await new Promise((resolve) => {
       imageObject.onload = resolve
@@ -81,19 +81,19 @@ const mapImagesFromGallery = (gallery: Gallery) => {
     const aspect = height / width
 
     return {
-      id: image.image,
+      id: image,
       rotation: new Vector3(0, 0, 0),
       position: new Vector3(0, 0, 0),
-      src: image.image,
+      src: image,
       aspect,
-      scale: 10,
+      scale: 10 * props.scale,
       speed: 0.5,
       opacity: 0.1,
     }
   })
 }
 
-const items = await Promise.all(mapImagesFromGallery(props.galleryFiles))
+const items = await Promise.all(mapImagesFromGallery(props.images))
 
 generateObjects(items)
 

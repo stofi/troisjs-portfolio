@@ -20,34 +20,13 @@ const galleryFiles = await Promise.all(
   )
 )
 
-const concatGalleryFiles = galleryFiles.reduce(
-  (acc, val) => ({
-    ...acc,
-    ...val,
-    attributes: {
-      ...acc.attributes,
-      ...val.attributes,
-      images: [...acc.attributes.images, ...val.attributes.images],
-    },
-  }),
-  {
-    attributes: {
-      images: [],
-    },
-  } as unknown as Gallery
-)
-
-// filter out duplicates
-concatGalleryFiles.attributes.images =
-  concatGalleryFiles.attributes.images.filter(
-    (image, index, self) =>
-      index === self.findIndex((t) => t.image === image.image)
-  )
+const concatGalleryFiles = galleryFiles.map((file) => file.attributes.thumbnail)
 
 const gallery = reactive({
   bounds: new Vector3(40, 80, 40),
-  seed: 1,
+  seed: 3,
+  scale: 2,
   speed: 0.5,
-  galleryFiles: concatGalleryFiles,
+  images: concatGalleryFiles,
 })
 </script>
