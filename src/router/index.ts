@@ -11,6 +11,11 @@ const configureRouter = () => {
         name: 'Home',
         component: Home,
       },
+      {
+        path: '/:gallery',
+        name: 'Gallery',
+        component: () => import('../views/GalleryPage.vue'),
+      },
     ],
   })
 

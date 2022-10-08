@@ -4,6 +4,7 @@
 
 <script lang="ts" setup>
 import { reactive } from 'vue'
+import { useRoute } from 'vue-router'
 
 import { Vector3 } from 'three'
 
@@ -19,28 +20,26 @@ const galleryFiles = await Promise.all(
     (key) => galleryModules[key]() as Promise<Gallery>
   )
 )
+const route = useRoute()
 
-const concatGalleryFiles = galleryFiles.reduce(
-  (acc, val) => ({
-    ...acc,
-    ...val,
-    attributes: {
-      ...acc.attributes,
-      ...val.attributes,
-      images: [...acc.attributes.images, ...val.attributes.images],
-    },
-  }),
-  {
-    attributes: {
-      images: [],
-    },
-  } as unknown as Gallery
+const galleryId: number = parseInt(
+  Array.isArray(route.params.gallery)
+    ? route.params.gallery[0]
+    : route.params.gallery
 )
+
+if (isNaN(galleryId)) {
+  throw new Error('Invalid gallery id')
+}
+
+if (galleryId >= galleryFiles.length) {
+  throw new Error('Gallery id out of range')
+}
 
 const gallery = reactive({
   bounds: new Vector3(40, 80, 40),
   seed: 1,
   speed: 0.5,
-  galleryFiles: concatGalleryFiles,
+  galleryFiles: galleryFiles[galleryId] ? galleryFiles[galleryId] : [],
 })
 </script>
