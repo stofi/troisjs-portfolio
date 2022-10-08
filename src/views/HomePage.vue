@@ -37,6 +37,13 @@ const concatGalleryFiles = galleryFiles.reduce(
   } as unknown as Gallery
 )
 
+// filter out duplicates
+concatGalleryFiles.attributes.images =
+  concatGalleryFiles.attributes.images.filter(
+    (image, index, self) =>
+      index === self.findIndex((t) => t.image === image.image)
+  )
+
 const gallery = reactive({
   bounds: new Vector3(40, 80, 40),
   seed: 1,
