@@ -26,6 +26,7 @@ export default function <Item extends FallerItem>(props: {
 }) {
   const store = useStore()
   const objects = ref<FallerItem[]>([])
+  const localspeed = ref(0.08)
 
   const bounds = reactive({
     x: 40,
@@ -51,7 +52,7 @@ export default function <Item extends FallerItem>(props: {
 
   const page = reactive({
     items: [] as FallerItem[],
-    step: 10,
+    step: 7,
     index: 0,
   })
 
@@ -90,11 +91,17 @@ export default function <Item extends FallerItem>(props: {
   }) => {
     const { speed } = props
     const { time } = event
-    const delta = time - prevTime
+    let delta = time - prevTime
     prevTime = time
 
+    if (!started.value) {
+      delta = 0
+    }
+    started.value = true
+
     objects.value.forEach((object) => {
-      object.position.y -= 0.16 * object.speed * speed * (delta / (1000 / 60))
+      object.position.y -=
+        localspeed.value * object.speed * speed * (delta / (1000 / 60))
 
       // snap to bounds
       if (object.position.y < -bounds.y / 2) {
@@ -108,12 +115,15 @@ export default function <Item extends FallerItem>(props: {
     })
   }
 
+  const started = ref(false)
+
   const start = () => {
     store.rendererComponent?.onBeforeRender(moveObjects)
   }
 
   const stop = () => {
     store.rendererComponent?.offBeforeRender(moveObjects)
+    started.value = false
   }
 
   onMounted(() => {
@@ -124,10 +134,20 @@ export default function <Item extends FallerItem>(props: {
     stop()
   })
 
+  const toggle = () => {
+    if (started.value) {
+      stop()
+    } else {
+      start()
+    }
+  }
+
   return {
     generateObjects,
     objects: objects as Ref<Item[]>,
     start,
     stop,
+    toggle,
+    started,
   }
 }

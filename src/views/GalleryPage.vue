@@ -1,5 +1,5 @@
 <template>
-  <ObjectGallery v-bind="gallery" @click="router.push('/')" />
+  <ObjectGallery enable-detail v-bind="gallery" @click="router.push('/')" />
 </template>
 
 <script lang="ts" setup>
@@ -23,6 +23,7 @@ export interface Gallery {
   }
   html: string
 }
+const magicSeed = 420
 
 const router = useRouter()
 
@@ -54,7 +55,7 @@ if (galleryId >= galleryFiles.length || galleryFiles[galleryId] === undefined) {
 }
 
 const gallery = reactive({
-  seed: galleryId,
+  seed: galleryId + magicSeed,
   speed: 0.5,
   scale: 1,
   images: galleryFiles[galleryId]
