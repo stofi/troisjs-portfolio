@@ -1,11 +1,9 @@
 <template>
-  <KeepAlive>
-    <Suspense>
-      <AppRenderer>
-        <router-view />
-      </AppRenderer>
-    </Suspense>
-  </KeepAlive>
+  <Suspense>
+    <AppRenderer>
+      <router-view />
+    </AppRenderer>
+  </Suspense>
 
   <!-- UI -->
   <div

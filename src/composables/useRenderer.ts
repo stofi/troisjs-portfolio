@@ -32,6 +32,8 @@ export default function useRenderer() {
     scene.value = rendererComponent.scene as THREE.Scene
 
     enableEffect.value = true
+    store.renderer = renderer.value
+    store.rendererComponent = rendererRef.value
   })
 
   return {

@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onErrorCaptured, reactive } from 'vue'
+import { onBeforeUnmount, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { Vector3 } from 'three'
@@ -54,7 +54,6 @@ if (galleryId >= galleryFiles.length || galleryFiles[galleryId] === undefined) {
 }
 
 const gallery = reactive({
-  bounds: new Vector3(40, 80, 40),
   seed: galleryId,
   speed: 0.5,
   scale: 1,

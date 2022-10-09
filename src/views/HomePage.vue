@@ -47,7 +47,6 @@ const onClick = (object: GalleryItem) => {
 }
 
 const gallery = reactive({
-  bounds: new Vector3(40, 80, 40),
   seed: 3,
   scale: 2,
   speed: 0.5,

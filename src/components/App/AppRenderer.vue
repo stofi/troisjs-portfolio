@@ -9,9 +9,17 @@
       enableDamping: true,
       dampingFactor: 0.05,
       enableRotate: false,
+      enablePan: false,
+      maxDistance: 60,
+      minDistance: 0,
     }"
   >
-    <Camera ref="cameraRef" :position="{ x: 0, y: 0, z: 50 }" />
+    <Camera
+      ref="cameraRef"
+      :far="80"
+      :near="10"
+      :position="{ x: 0, y: 0, z: 50 }"
+    />
 
     <Scene ref="sceneRef">
       <DirectionalLight :position="{ x: 20, y: 20, z: 60 }" :intensity="1" />

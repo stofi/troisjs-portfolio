@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineEmits, defineProps, onBeforeUnmount, onMounted, ref } from 'vue'
+import { defineEmits, defineProps } from 'vue'
 
 import { Vector3 } from 'three'
 import { PhysicalMaterial, Plane, Texture } from 'troisjs'
@@ -45,15 +45,13 @@ export interface GalleryItem {
 }
 
 const props = defineProps<{
-  bounds: Vector3
   seed: number
   speed: number
   scale: number
   images: string[]
 }>()
 
-const { generateObjects, startInterval, stopInterval, objects } =
-  useFaller<GalleryItem>(props)
+const { generateObjects, start, stop, objects } = useFaller<GalleryItem>(props)
 
 const mapImagesFromGallery = (images: string[]) => {
   return images.map(async (image) => {
@@ -73,7 +71,7 @@ const mapImagesFromGallery = (images: string[]) => {
       position: new Vector3(0, 0, 0),
       src: image,
       aspect,
-      scale: 10 * props.scale,
+      scale: 20 * props.scale,
       speed: 0.5,
       opacity: 0.1,
     }
@@ -91,12 +89,4 @@ const onClick = (object: GalleryItem) => {
 }
 
 generateObjects(items)
-
-onMounted(() => {
-  startInterval()
-})
-
-onBeforeUnmount(() => {
-  stopInterval()
-})
 </script>
