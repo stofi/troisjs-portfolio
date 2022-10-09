@@ -5,6 +5,11 @@
     </AppRenderer>
   </Suspense>
 
+  <button
+    v-if="requestPermissionResponse !== 'granted' && showOverlay"
+    class="absolute inset-0"
+    @click="requestPermission"
+  ></button>
   <!-- UI -->
   <div
     id="ui"
@@ -17,6 +22,7 @@
       >
         <HomeIcon class="w-10 h-10 text-white/80" />
       </button>
+
       <div v-for="text in store.texts" :key="text">
         {{ text }}
       </div>
@@ -37,32 +43,49 @@
     >
       <div
         class="flex flex-col items-center justify-center w-full h-full gap-2"
-      >
-        <div class="flex gap-2"></div>
-      </div>
+      ></div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onActivated, onErrorCaptured, reactive } from 'vue'
+import { onActivated, onErrorCaptured, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { HomeIcon } from '@heroicons/vue/24/outline'
+import { CheckCircleIcon, HomeIcon } from '@heroicons/vue/24/outline'
 import { useDeviceOrientation } from '@vueuse/core'
 
 import AppRenderer from '@/components/App/AppRenderer.vue'
 import useStore from '@/composables/useStore'
 
+interface DeviceOrientationEventiOS extends DeviceOrientationEvent {
+  requestPermission?: () => Promise<'granted' | 'denied'>
+}
+
+const requestPermissionResponse = ref<'granted' | 'denied'>('denied')
+
+const showOverlay = ref(true)
+requestPermission()
+
+async function requestPermission() {
+  const fn = (DeviceOrientationEvent as unknown as DeviceOrientationEventiOS)
+    .requestPermission
+  const iOS = typeof fn === 'function'
+
+  if (iOS) {
+    const response = await fn()
+    requestPermissionResponse.value = response
+
+    if (response === 'granted') {
+      // execute
+    }
+  }
+  showOverlay.value = false
+}
 const router = useRouter()
 
 onErrorCaptured((error) => {
   router.push('/')
-})
-
-window.addEventListener('deviceorientation', (event) => {
-  console.log(event)
-  alert('deviceorientation')
 })
 
 const store = useStore()
