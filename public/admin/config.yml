@@ -1,34 +1,66 @@
 backend:
   name: github
   repo: stofi/troisjs-portfolio
-media_folder: "public/images/uploads"
-public_folder: "/images/uploads"
+media_folder: public/images/uploads
+public_folder: /images/uploads
 collections:
-  - name: "blog" # Used in routes, e.g., /admin/collections/blog
-    label: "Blog" # Used in the UI
-    folder: "content/_posts/blog" # The path to the folder where the documents are stored
-    create: true # Allow users to create new documents in this collection
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}" # Filename template, e.g., YYYY-MM-DD-title.md
-    fields: # The fields for each document, usually in front matter
-      - {label: "Layout", name: "layout", widget: "hidden", default: "blog"}
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Publish Date", name: "date", widget: "datetime"}
-      - {label: "Featured Image", name: "thumbnail", widget: "image"}
-      - {label: "Rating (scale of 1-5)", name: "rating", widget: "number"}
-      - {label: "Body", name: "body", widget: "markdown"}
-  - name: "Gallery"
-    label: "Gallery"
-    folder: "content/_posts/gallery"
+  - name: blog
+    label: Blog
+    folder: content/_posts/blog
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    slug: '{{year}}-{{month}}-{{day}}-{{slug}}'
     fields:
-      - {label: "Layout", name: "layout", widget: "hidden", default: "gallery"}
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Publish Date", name: "date", widget: "datetime"}
-      - {label: "Featured Image", name: "thumbnail", widget: "image"}
-      - {label: "Rating (scale of 1-5)", name: "rating", widget: "number"}
-      - {label: "Body", name: "body", widget: "markdown"}
-      - {label: "Images", name: "images", widget: "list", fields: 
-        - {label: "Image", name: "image", widget: "image"}
-        - {label: "Title", name: "title", widget: "string"}
-
+      - label: Layout
+        name: layout
+        widget: hidden
+        default: blog
+      - label: Title
+        name: title
+        widget: string
+      - label: Publish Date
+        name: date
+        widget: datetime
+      - label: Featured Image
+        name: thumbnail
+        widget: image
+      - label: Rating (scale of 1-5)
+        name: rating
+        widget: number
+      - label: Body
+        name: body
+        widget: markdown
+  - name: Gallery
+    label: Gallery
+    folder: content/_posts/gallery
+    create: true
+    slug: '{{year}}-{{month}}-{{day}}-{{slug}}'
+    fields:
+      - label: Layout
+        name: layout
+        widget: hidden
+        default: gallery
+      - label: Title
+        name: title
+        widget: string
+      - label: Publish Date
+        name: date
+        widget: datetime
+      - label: Featured Image
+        name: thumbnail
+        widget: image
+      - label: Rating (scale of 1-5)
+        name: rating
+        widget: number
+      - label: Body
+        name: body
+        widget: markdown
+      - label: Images
+        name: images
+        widget: list
+        fields:
+          - label: Title
+            name: title
+            widget: string
+          - label: Image
+            name: image
+            widget: image
