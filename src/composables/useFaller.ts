@@ -1,6 +1,7 @@
 import {
   computed,
   defineProps,
+  onActivated,
   onBeforeUnmount,
   onMounted,
   reactive,

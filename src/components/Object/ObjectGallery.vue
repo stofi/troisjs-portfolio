@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineEmits, defineProps, ref } from 'vue'
+import { defineEmits, defineProps, onMounted, ref } from 'vue'
 
 import { CanvasTexture, Vector3 } from 'three'
 import { BasicMaterial, Group, PhysicalMaterial, Plane, Texture } from 'troisjs'
@@ -171,7 +171,30 @@ store.rendererComponent?.onBeforeRender(() => {
     }
 
     if (started.value) {
-      const zOffset = 30 + (object.aspect > 1 ? -10 : 0)
+      const screenAspect = window.innerWidth / window.innerHeight
+
+      let zOffset = 30
+
+      // change offset based on screen and object aspect
+      if (screenAspect > 1) {
+        // screen landscape
+        if (object.aspect < 1) {
+          // object landscape
+          zOffset = 30
+        } else {
+          // object portrait
+          zOffset = 20
+        }
+      } else {
+        // screen portrait
+        if (object.aspect < 1) {
+          // object landscape
+          zOffset = 20
+        } else {
+          // object portrait
+          zOffset = 20
+        }
+      }
       galleryPosition.value.x = -object.position.x
       galleryPosition.value.y = -object.position.y
       galleryPosition.value.z = -object.position.z + zOffset
@@ -192,5 +215,7 @@ store.rendererComponent?.onBeforeRender(() => {
   }
 })
 
-generateObjects(items)
+onMounted(() => {
+  generateObjects(items)
+})
 </script>

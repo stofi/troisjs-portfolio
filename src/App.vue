@@ -11,6 +11,12 @@
     class="absolute inset-0 grid grid-cols-12 grid-rows-6 overflow-hidden pointer-events-none"
   >
     <div id="teleport-header" class="row-start-1 row-end-2 p-2 col-span-full">
+      <button
+        class="p-2 border-2 rounded-lg pointer-events-auto backdrop-blur-sm border-white/5"
+        @click="router.push('/')"
+      >
+        <HomeIcon class="w-12 h-12 [&>path]:opacity-50" />
+      </button>
       <div v-for="text in store.texts" :key="text">
         {{ text }}
       </div>
@@ -41,6 +47,8 @@
 <script lang="ts" setup>
 import { onActivated, onErrorCaptured } from 'vue'
 import { useRouter } from 'vue-router'
+
+import { HomeIcon } from '@heroicons/vue/24/solid'
 
 import AppRenderer from '@/components/App/AppRenderer.vue'
 import InputButton from '@/components/Input/InputButton.vue'
