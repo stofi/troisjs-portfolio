@@ -12,10 +12,10 @@
   >
     <div id="teleport-header" class="row-start-1 row-end-2 p-2 col-span-full">
       <button
-        class="p-2 border-2 rounded-lg pointer-events-auto backdrop-blur-sm border-white/5"
+        class="p-3 transition-opacity border-2 rounded-full opacity-50 pointer-events-auto hover:opacity-100 backdrop-blur-sm border-white/40"
         @click="router.push('/')"
       >
-        <HomeIcon class="w-12 h-12 [&>path]:opacity-50" />
+        <HomeIcon class="w-10 h-10 text-white/80" />
       </button>
       <div v-for="text in store.texts" :key="text">
         {{ text }}
@@ -48,7 +48,7 @@
 import { onActivated, onErrorCaptured } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { HomeIcon } from '@heroicons/vue/24/solid'
+import { HomeIcon } from '@heroicons/vue/24/outline'
 
 import AppRenderer from '@/components/App/AppRenderer.vue'
 import InputButton from '@/components/Input/InputButton.vue'
