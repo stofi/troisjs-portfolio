@@ -37,6 +37,7 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
+import { useDeviceOrientation } from '@vueuse/core'
 import { Vector2, Vector3 } from 'three'
 import {
   Camera,
@@ -52,6 +53,8 @@ import {
 
 import useRenderer from '@/composables/useRenderer'
 import useStore from '@/composables/useStore'
+
+const { isAbsolute, alpha, beta, gamma } = useDeviceOrientation()
 
 const store = useStore()
 const tiltStrength = 0.02

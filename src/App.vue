@@ -45,20 +45,24 @@
 </template>
 
 <script lang="ts" setup>
-import { onActivated, onErrorCaptured } from 'vue'
+import { onActivated, onErrorCaptured, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { HomeIcon } from '@heroicons/vue/24/outline'
+import { useDeviceOrientation } from '@vueuse/core'
 
 import AppRenderer from '@/components/App/AppRenderer.vue'
-import InputButton from '@/components/Input/InputButton.vue'
-import InputRange from '@/components/Input/InputRange.vue'
 import useStore from '@/composables/useStore'
 
 const router = useRouter()
 
 onErrorCaptured((error) => {
   router.push('/')
+})
+
+window.addEventListener('deviceorientation', (event) => {
+  console.log(event)
+  alert('deviceorientation')
 })
 
 const store = useStore()
