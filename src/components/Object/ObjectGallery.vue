@@ -8,6 +8,7 @@
     :width-segments="1"
     :height-segments="1"
     :rotation="object.rotation"
+    @click="onClick(object)"
   >
     <PhysicalMaterial
       color="#ffffff"
@@ -25,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, onBeforeUnmount, onMounted, ref } from 'vue'
+import { defineEmits, defineProps, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { Vector3 } from 'three'
 import { PhysicalMaterial, Plane, Texture } from 'troisjs'
@@ -41,20 +42,6 @@ export interface GalleryItem {
   scale: number
   speed: number
   opacity: number
-}
-
-export interface Gallery {
-  attributes: {
-    layout: string
-    title: string
-    date: string
-    thumbnail: string
-    rating: number
-    images: {
-      image: string
-    }[]
-  }
-  html: string
 }
 
 const props = defineProps<{
@@ -94,6 +81,14 @@ const mapImagesFromGallery = (images: string[]) => {
 }
 
 const items = await Promise.all(mapImagesFromGallery(props.images))
+
+const emits = defineEmits<{
+  (event: 'click', object: GalleryItem): void
+}>()
+
+const onClick = (object: GalleryItem) => {
+  emits('click', object)
+}
 
 generateObjects(items)
 

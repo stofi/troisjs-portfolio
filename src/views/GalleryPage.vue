@@ -1,5 +1,5 @@
 <template>
-  <ObjectGallery v-bind="gallery" />
+  <ObjectGallery v-bind="gallery" @click="router.push('/')" />
 </template>
 
 <script lang="ts" setup>
@@ -8,8 +8,21 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { Vector3 } from 'three'
 
-import type { Gallery } from '@/components/Object/ObjectGallery.vue'
 import ObjectGallery from '@/components/Object/ObjectGallery.vue'
+
+export interface Gallery {
+  attributes: {
+    layout: string
+    title: string
+    date: string
+    thumbnail: string
+    rating: number
+    images: {
+      image: string
+    }[]
+  }
+  html: string
+}
 
 const router = useRouter()
 

@@ -1,14 +1,31 @@
 <template>
-  <ObjectGallery v-bind="gallery" />
+  <ObjectGallery v-bind="gallery" @click="onClick" />
 </template>
 
 <script lang="ts" setup>
 import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { Vector3 } from 'three'
 
-import type { Gallery } from '@/components/Object/ObjectGallery.vue'
+import type { GalleryItem } from '@/components/Object/ObjectGallery.vue'
 import ObjectGallery from '@/components/Object/ObjectGallery.vue'
+
+export interface Gallery {
+  attributes: {
+    layout: string
+    title: string
+    date: string
+    thumbnail: string
+    rating: number
+    images: {
+      image: string
+    }[]
+  }
+  html: string
+}
+
+const router = useRouter()
 
 const galleryModules = await import.meta.glob(
   '@/../content/_posts/gallery/*.md'
@@ -21,6 +38,13 @@ const galleryFiles = await Promise.all(
 )
 
 const concatGalleryFiles = galleryFiles.map((file) => file.attributes.thumbnail)
+
+const onClick = (object: GalleryItem) => {
+  const { src } = object
+
+  const index = concatGalleryFiles.indexOf(src)
+  router.push(`/gallery/${index}`)
+}
 
 const gallery = reactive({
   bounds: new Vector3(40, 80, 40),
