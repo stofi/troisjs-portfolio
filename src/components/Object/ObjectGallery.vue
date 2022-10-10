@@ -59,6 +59,7 @@ export interface GalleryItem {
   color: string
   name: string
   texture: CanvasTexture
+  detail: boolean
 }
 
 export interface GenericItem {
@@ -120,6 +121,7 @@ const mapImagesFromGallery = (images: string[] | GenericItem[]) => {
       opacity: 0.1,
       color: randomHexColor(),
       texture: paintTexture(gi.name),
+      detail: false,
     }
   })
 }
@@ -164,11 +166,8 @@ store.rendererComponent?.onBeforeRender(() => {
     )
     clickQueue.value = []
 
-    if (!props.enableDetail) {
-      emits('click', object)
-
-      return
-    }
+    emits('click', object)
+    if (!props.enableDetail) return
 
     if (started.value) {
       const screenAspect = window.innerWidth / window.innerHeight
@@ -202,9 +201,11 @@ store.rendererComponent?.onBeforeRender(() => {
 
       objects.value.forEach((o) => {
         o.opacity = 0
+        o.detail = false
       })
       object.opacity = 1
       object.position.z = z
+      object.detail = true
     } else {
       galleryPosition.value.x = 0
       galleryPosition.value.y = 0

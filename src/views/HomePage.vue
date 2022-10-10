@@ -70,8 +70,10 @@ const concatGalleryFiles: GenericItem[] = galleryFiles.map((file) => ({
 const onClick = (object: GalleryItem) => {
   const { src } = object
 
-  const index = concatGalleryFiles.findIndex((item) => item.src === src)
-  router.push(`/gallery/${index}`)
+  if (object.detail) {
+    const index = concatGalleryFiles.findIndex((item) => item.src === src)
+    router.push(`/gallery/${index}`)
+  }
 }
 
 const gallery = reactive({
@@ -79,6 +81,6 @@ const gallery = reactive({
   scale: 1.2,
   speed: 0.5,
   images: concatGalleryFiles,
-  enableDetail: false,
+  enableDetail: true,
 })
 </script>
