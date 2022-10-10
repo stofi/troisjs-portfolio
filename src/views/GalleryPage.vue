@@ -1,36 +1,18 @@
 <template>
-  <ObjectGallery enable-detail v-bind="gallery">
-    <template #itemSlot="{ object }">
-      <Plane
-        :width="10"
-        :height="10"
-        :position="{
-          x: 5,
-          y: -5,
-        }"
-      >
-        <BasicMaterial
-          :props="{
-            transparent: true,
-            opacity: object.opacity,
-          }"
-        >
-          <CanvasTexture :canvas-texture="object.texture"></CanvasTexture>
-        </BasicMaterial>
-      </Plane> </template
-  ></ObjectGallery>
+  <ObjectGallery
+    :active="store.pages.gallery.active"
+    enable-detail
+    v-bind="gallery"
+  >
+  </ObjectGallery>
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, reactive } from 'vue'
+import { reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { Vector3 } from 'three'
-import { BasicMaterial, Plane, Texture } from 'troisjs'
-
-import CanvasTexture from '@/components/CanvasTexture'
-import type { GenericItem } from '@/components/Object/ObjectGallery.vue'
 import ObjectGallery from '@/components/Object/ObjectGallery.vue'
+import useStore from '@/composables//useStore'
 
 export interface Gallery {
   attributes: {
@@ -49,6 +31,8 @@ export interface Gallery {
 const magicSeed = 420
 
 const router = useRouter()
+const store = useStore()
+const route = useRoute()
 
 const galleryModules = await import.meta.glob(
   '@/../content/_posts/gallery/*.md'
@@ -59,7 +43,6 @@ const galleryFiles = await Promise.all(
     (key) => galleryModules[key]() as Promise<Gallery>
   )
 )
-const route = useRoute()
 
 const galleryId: number = parseInt(
   Array.isArray(route.params.gallery)

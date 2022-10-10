@@ -1,50 +1,79 @@
 <template>
-  <Group :position="galleryPosition">
-    <Group
-      v-for="object in objects"
-      :key="object.id"
-      :position="object.position"
-    >
-      <Plane
-        :width="object.scale"
-        :height="object.scale * object.aspect"
-        :width-segments="1"
-        :height-segments="1"
-        @click="onClick(object, $event)"
-      >
-        <PhysicalMaterial
-          color="#ffffff"
-          :props="{
-            roughness: 0.9,
-            clearcoat: 0.02,
-            clearcoatRoughness: 0.2,
-            transparent: true,
-            opacity: object.opacity,
-          }"
+  <Group :position="{ z: 40 }" :rotation="{ y: options.globalYRotation }">
+    <Group :position="{ z: -40 }">
+      <Group :position="galleryPosition">
+        <Group
+          v-for="object in objects"
+          :key="object.id"
+          :position="object.position"
         >
-          <Texture :src="object.src" />
-        </PhysicalMaterial>
-      </Plane>
-      <Group
-        :position="{
-          x: -object.scale / 2 + 0.5,
-          y: -(object.scale * object.aspect) / 2 - 0.5,
-          z: 0.01,
-        }"
-      >
-        <slot name="itemSlot" :object="object"></slot>
+          <Plane
+            :width="object.scale"
+            :height="object.scale * object.aspect"
+            :width-segments="1"
+            :height-segments="1"
+            @click="onClick(object, $event)"
+          >
+            <PhysicalMaterial
+              color="#ffffff"
+              :props="{
+                roughness: 0.9,
+                clearcoat: 0.02,
+                clearcoatRoughness: 0.2,
+                transparent: true,
+                opacity: object.opacity * options.opacity,
+              }"
+            >
+              <Texture :src="object.src" />
+            </PhysicalMaterial>
+          </Plane>
+          <Group
+            :position="{
+              x: -object.scale / 2 + 0.5,
+              y: -(object.scale * object.aspect) / 2 - 0.5,
+              z: 0.01,
+            }"
+          >
+            <Plane
+              :width="10"
+              :height="10"
+              :position="{
+                x: 5,
+                y: -5,
+              }"
+            >
+              <BasicMaterial
+                :props="{
+                  transparent: true,
+                  opacity: object.opacity * options.opacity,
+                }"
+              >
+                <CanvasTexture :canvas-texture="object.texture"></CanvasTexture>
+              </BasicMaterial>
+            </Plane>
+          </Group>
+        </Group>
       </Group>
     </Group>
   </Group>
 </template>
 
 <script lang="ts" setup>
-import { defineEmits, defineProps, onMounted, ref } from 'vue'
+import {
+  defineEmits,
+  defineProps,
+  onActivated,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from 'vue'
 
 import gsap from 'gsap'
-import { CanvasTexture, Vector3 } from 'three'
+import { CanvasTexture as CT, Vector3 } from 'three'
 import { BasicMaterial, Group, PhysicalMaterial, Plane, Texture } from 'troisjs'
 
+import CanvasTexture from '@/components/CanvasTexture'
 import useFaller from '@/composables/useFaller'
 import useStore from '@/composables/useStore'
 
@@ -59,7 +88,7 @@ export interface GalleryItem {
   opacity: number
   color: string
   name: string
-  texture: CanvasTexture
+  texture: CT
   detail: boolean
 }
 
@@ -74,7 +103,39 @@ const props = defineProps<{
   scale: number
   images: string[] | GenericItem[]
   enableDetail: boolean
+  active: boolean
 }>()
+
+const options = reactive({
+  opacity: 1,
+  globalYRotation: 0,
+})
+
+watch(
+  () => props.active,
+  (active, wasActive) => {
+    if (active && !wasActive) {
+      options.globalYRotation = -Math.PI / 2
+
+      gsap.to(options, {
+        globalYRotation: 0,
+        opacity: 1,
+        duration: 10,
+        ease: 'power4.out',
+      })
+    } else if (!active && wasActive) {
+      gsap.to(options, {
+        globalYRotation: Math.PI / 2,
+        opacity: 0,
+        duration: 10,
+        ease: 'power4.out',
+        onComplete: () => {
+          options.globalYRotation = 0
+        },
+      })
+    }
+  }
+)
 
 const { generateObjects, started, toggle, objects } =
   useFaller<GalleryItem>(props)
@@ -94,7 +155,7 @@ const paintTexture = (text: string) => {
   ctx.textBaseline = 'middle'
   ctx.fillText(text, 0, 28)
 
-  return new CanvasTexture(canvas)
+  return new CT(canvas)
 }
 
 const mapImagesFromGallery = (images: string[] | GenericItem[]) => {
@@ -148,11 +209,14 @@ const clickQueue = ref<ClickQueueEntry[]>([])
 const store = useStore()
 
 const onClick = (object: GalleryItem, event: ClickEvent) => {
+  if (!props.active) return
   // emits('click', object)
   clickQueue.value.push({ object, event })
 }
 
 store.rendererComponent?.onBeforeRender(() => {
+  if (!props.active) return
+
   if (clickQueue.value.length > 0) {
     // find object with smallest distance
     const { object, event } = clickQueue.value.reduce(

@@ -1,40 +1,22 @@
 <template>
-  <ObjectGallery v-bind="gallery" @click="onClick">
-    <template #itemSlot="{ object }">
-      <Plane
-        :width="10"
-        :height="10"
-        :position="{
-          x: 5,
-          y: -5,
-        }"
-      >
-        <BasicMaterial
-          :props="{
-            transparent: true,
-            opacity: object.opacity,
-          }"
-        >
-          <CanvasTexture :canvas-texture="object.texture"></CanvasTexture>
-        </BasicMaterial>
-      </Plane>
-    </template>
+  <ObjectGallery
+    :active="store.pages.home.active"
+    v-bind="gallery"
+    @click="onClick"
+  >
   </ObjectGallery>
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { Vector3 } from 'three'
-import { BasicMaterial, Plane, Texture } from 'troisjs'
-
-import CanvasTexture from '@/components/CanvasTexture'
 import type {
   GalleryItem,
   GenericItem,
 } from '@/components/Object/ObjectGallery.vue'
 import ObjectGallery from '@/components/Object/ObjectGallery.vue'
+import useStore from '@/composables/useStore'
 
 export interface Gallery {
   attributes: {
@@ -50,6 +32,7 @@ export interface Gallery {
   html: string
 }
 
+const store = useStore()
 const router = useRouter()
 
 const galleryModules = await import.meta.glob(

@@ -1,7 +1,11 @@
 <template>
   <Suspense>
     <AppRenderer>
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <template>
+          <component :is="Component" />
+        </template>
+      </router-view>
     </AppRenderer>
   </Suspense>
 
