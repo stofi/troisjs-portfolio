@@ -41,6 +41,7 @@
 <script lang="ts" setup>
 import { defineEmits, defineProps, onMounted, ref } from 'vue'
 
+import gsap from 'gsap'
 import { CanvasTexture, Vector3 } from 'three'
 import { BasicMaterial, Group, PhysicalMaterial, Plane, Texture } from 'troisjs'
 
@@ -194,22 +195,46 @@ store.rendererComponent?.onBeforeRender(() => {
           zOffset = 20
         }
       }
-      galleryPosition.value.x = -object.position.x
-      galleryPosition.value.y = -object.position.y
-      galleryPosition.value.z = -object.position.z + zOffset
+
+      gsap.to(galleryPosition.value, {
+        x: -object.position.x,
+        y: -object.position.y,
+        z: -object.position.z + zOffset,
+        duration: 1,
+        ease: 'power4.out',
+      })
       const z = object.position.z
 
       objects.value.forEach((o) => {
-        o.opacity = 0
         o.detail = false
+
+        gsap.to(o, {
+          opacity: 0,
+          duration: 1,
+          ease: 'power4.out',
+        })
       })
-      object.opacity = 1
-      object.position.z = z
       object.detail = true
+
+      gsap.to(object, {
+        opacity: 1,
+        duration: 1,
+        ease: 'power4.out',
+      })
+
+      gsap.to(object.position, {
+        z,
+        duration: 1,
+        ease: 'power4.out',
+      })
     } else {
-      galleryPosition.value.x = 0
-      galleryPosition.value.y = 0
-      galleryPosition.value.z = 0
+      gsap.to(galleryPosition.value, {
+        x: 0,
+        y: 0,
+        z: 0,
+        duration: 1,
+        ease: 'power4.out',
+      })
     }
 
     toggle()

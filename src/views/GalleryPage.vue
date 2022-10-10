@@ -1,5 +1,5 @@
 <template>
-  <ObjectGallery enable-detail v-bind="gallery" @click="router.push('/')">
+  <ObjectGallery enable-detail v-bind="gallery">
     <template #itemSlot="{ object }">
       <Plane
         :width="10"

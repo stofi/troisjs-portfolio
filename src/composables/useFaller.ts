@@ -9,6 +9,7 @@ import {
   ref,
 } from 'vue'
 
+import gsap from 'gsap'
 import { Vector3 } from 'three'
 import { PhysicalMaterial, Plane, Texture } from 'troisjs'
 
@@ -112,7 +113,12 @@ export default function <Item extends FallerItem>(props: {
         page.index = (page.index + 1) % page.items.length
       }
       const absY = Math.abs(object.position.y) / (bounds.y / 2)
-      object.opacity = 1 - map(absY, 0.8, 1, 0, 1, true)
+
+      // object.opacity = 1 - map(absY, 0.8, 1, 0, 1, true)
+      gsap.to(object, {
+        opacity: 1 - map(absY, 0.8, 1, 0, 1, true),
+        duration: 0.5,
+      })
     })
   }
 
