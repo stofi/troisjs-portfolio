@@ -1,3 +1,4 @@
+import './assets/fonts/fira.css'
 import './assets/tailwind.css'
 
 import { createApp } from 'vue'

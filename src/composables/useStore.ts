@@ -1,4 +1,4 @@
-import { ComponentPublicInstance, reactive } from 'vue'
+import { ComponentPublicInstance, computed, reactive } from 'vue'
 
 import gsap from 'gsap'
 import { Vector3, WebGLRenderer } from 'three'
@@ -27,6 +27,10 @@ interface Store {
   onResetDetails?: () => void
   shuffle: () => void
   onShuffle?: () => void
+  showArrowLeft: boolean
+  showArrowRight: boolean
+  onClickLeft: () => void
+  onClickRight: () => void
 }
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -65,6 +69,14 @@ const store = reactive<Store>({
   },
   shuffle() {
     store.onShuffle && store.onShuffle()
+  },
+  showArrowLeft: false,
+  showArrowRight: false,
+  onClickLeft() {
+    //
+  },
+  onClickRight() {
+    //
   },
 })
 

@@ -1,14 +1,15 @@
 <template>
   <ObjectGallery
-    :active="store.pages.home.active"
     v-bind="gallery"
+    enable-detail
+    :active="active"
     @click="onClick"
   >
   </ObjectGallery>
 </template>
 
 <script lang="ts" setup>
-import { reactive, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import type {
@@ -45,29 +46,25 @@ const galleryFiles = await Promise.all(
   )
 )
 
-const concatGalleryFiles: GenericItem[] = galleryFiles.map((file) => ({
+const concatGalleryFiles: GenericItem[] = galleryFiles.map((file, i) => ({
   src: file.attributes.thumbnail,
   name: file.attributes.title,
+  path: `/gallery/${i}`,
 }))
 
 const onClick = async (object: GalleryItem) => {
   const { src } = object
 
   if (object.detail) {
-    const index = concatGalleryFiles.findIndex((item) => item.src === src)
-    await store.deactivatePage()
-    await store.setPageActive('gallery')
-
-    router.push(`/gallery/${index}`)
-    object.detail = false
+    alert('detail')
   }
 }
+const active = computed(() => store.pages.home.active)
 
 const gallery = reactive({
   seed: 15,
   scale: 1.2,
   speed: 0.5,
   images: concatGalleryFiles,
-  enableDetail: true,
 })
 </script>

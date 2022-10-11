@@ -1,14 +1,10 @@
 <template>
-  <ObjectGallery
-    :active="store.pages.gallery.active"
-    enable-detail
-    v-bind="gallery"
-  >
+  <ObjectGallery :active="active" enable-detail v-bind="gallery">
   </ObjectGallery>
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { computed, onActivated, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ObjectGallery from '@/components/Object/ObjectGallery.vue'
@@ -33,6 +29,7 @@ const magicSeed = 420
 const router = useRouter()
 const store = useStore()
 const route = useRoute()
+const active = computed(() => store.pages.gallery.active)
 
 const galleryModules = await import.meta.glob(
   '@/../content/_posts/gallery/*.md'

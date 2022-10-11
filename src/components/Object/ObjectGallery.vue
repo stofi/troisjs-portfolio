@@ -8,8 +8,10 @@
           :position="object.position"
         >
           <Plane
-            :width="object.scale"
-            :height="object.scale * object.aspect"
+            :width="object.scale * (object.aspect > 1 ? 0.8 : 1)"
+            :height="
+              object.scale * object.aspect * (object.aspect > 1 ? 0.8 : 1)
+            "
             :width-segments="1"
             :height-segments="1"
             @click="onClick(object, $event)"
@@ -29,17 +31,24 @@
           </Plane>
           <Group
             :position="{
-              x: -object.scale / 2 + 0.5,
-              y: -(object.scale * object.aspect) / 2 - 0.5,
+              x: -(object.scale * (object.aspect > 1 ? 0.8 : 1)) / 2 + 0.5,
+              y:
+                -(
+                  object.scale *
+                  object.aspect *
+                  (object.aspect > 1 ? 0.8 : 1)
+                ) /
+                  2 -
+                0.5,
               z: 0.01,
             }"
           >
             <Plane
-              :width="10"
-              :height="10"
+              :width="8"
+              :height="8"
               :position="{
-                x: 5,
-                y: -5,
+                x: 4,
+                y: -4,
               }"
             >
               <BasicMaterial
@@ -68,6 +77,7 @@ import {
   ref,
   watch,
 } from 'vue'
+import { useRouter } from 'vue-router'
 
 import gsap from 'gsap'
 import { CanvasTexture as CT, Vector3 } from 'three'
@@ -90,11 +100,13 @@ export interface GalleryItem {
   name: string
   texture: CT
   detail: boolean
+  path: string
 }
 
 export interface GenericItem {
   src: string
   name: string
+  path?: string
 }
 
 const props = defineProps<{
@@ -110,6 +122,7 @@ const options = reactive({
   opacity: 1,
   globalYRotation: 0,
 })
+const router = useRouter()
 
 watch(
   () => props.active,
@@ -135,6 +148,7 @@ watch(
       })
     }
   }
+  // { immediate: true }
 )
 
 const { generateObjects, started, toggle, objects } =
@@ -150,7 +164,7 @@ const paintTexture = (text: string) => {
   const ctx = canvas.getContext('2d')!
   // write text from top left, white on transparent
   ctx.fillStyle = 'white'
-  ctx.font = 'bold 32px sans-serif'
+  ctx.font = `bold 32px "Fira Code VF"`
   ctx.textAlign = 'left'
   ctx.textBaseline = 'middle'
   ctx.fillText(text, 0, 28)
@@ -184,6 +198,7 @@ const mapImagesFromGallery = (images: string[] | GenericItem[]) => {
       color: randomHexColor(),
       texture: paintTexture(gi.name),
       detail: false,
+      path: gi.path || '',
     }
   })
 }
@@ -222,13 +237,13 @@ store.onResetDetails = () => {
 }
 
 const onClick = (object: GalleryItem, event: ClickEvent) => {
-  if (!props.active) return
-  // emits('click', object)
+  // if (!props.active) return
+
   clickQueue.value.push({ object, event })
 }
 
 store.rendererComponent?.onBeforeRender(() => {
-  if (!props.active) return
+  // if (!props.active) return
 
   if (clickQueue.value.length > 0) {
     // find object with smallest distance
@@ -248,6 +263,21 @@ store.rendererComponent?.onBeforeRender(() => {
     if (!props.enableDetail) return
 
     if (started.value) {
+      object.detail = true
+
+      if (object.path) {
+        store.showArrowRight = true
+
+        store.onClickRight = () => {
+          router.push(object.path)
+
+          store.showArrowRight = false
+
+          store.onClickRight = () => {
+            // router.push(object.path)
+          }
+        }
+      }
       const screenAspect = window.innerWidth / window.innerHeight
 
       let zOffset = 30
@@ -291,7 +321,6 @@ store.rendererComponent?.onBeforeRender(() => {
           ease: 'power4.out',
         })
       })
-      object.detail = true
 
       gsap.to(object, {
         opacity: 1,
@@ -305,6 +334,12 @@ store.rendererComponent?.onBeforeRender(() => {
         ease: 'power4.out',
       })
     } else {
+      store.showArrowRight = false
+
+      store.onClickRight = () => {
+        //
+      }
+
       gsap.to(galleryPosition.value, {
         x: 0,
         y: 0,

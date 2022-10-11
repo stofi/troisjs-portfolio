@@ -49,21 +49,53 @@
     ></div>
     <div
       id="teleport-footer"
-      class="row-start-5 row-end-7 p-2 md:row-start-6 col-span-full"
+      class="flex items-end justify-between row-start-5 row-end-7 p-2 md:row-start-6 col-span-full"
     >
-      <div
-        class="flex flex-col items-center justify-center w-full h-full gap-2"
-      ></div>
+      <button
+        class="p-3 mr-auto transition-opacity rounded-full"
+        :class="
+          store.showArrowLeft
+            ? 'pointer-events-auto opacity-50 hover:opacity-100'
+            : 'opacity-0 pointer-events-none hover:opacity-0'
+        "
+        @click="store.onClickLeft"
+      >
+        <ArrowLeftIcon class="w-10 h-10 text-white/80" />
+      </button>
+      <button
+        class="p-3 ml-auto transition-opacity rounded-full"
+        :class="
+          store.showArrowRight
+            ? 'pointer-events-auto  opacity-50 hover:opacity-100'
+            : 'opacity-0 pointer-events-none'
+        "
+        @click="store.onClickRight"
+      >
+        <ArrowRightIcon class="w-10 h-10 text-white/80" />
+      </button>
+
+      <div v-for="text in store.texts" :key="text">
+        {{ text }}
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onActivated, onErrorCaptured, reactive, ref } from 'vue'
+import {
+  nextTick,
+  onActivated,
+  onErrorCaptured,
+  onMounted,
+  reactive,
+  ref,
+} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import {
+  ArrowLeftIcon,
   ArrowPathIcon,
+  ArrowRightIcon,
   CheckCircleIcon,
   HomeIcon,
 } from '@heroicons/vue/24/outline'
@@ -117,12 +149,20 @@ const goHome = async () => {
 onErrorCaptured((error) => {
   router.push('/')
 })
+
+onMounted(async () => {
+  if (route.name === 'home') {
+    await store.setPageActive('home')
+  } else if (route.name === 'Gallery') {
+    await store.setPageActive('gallery')
+  }
+})
 </script>
 
 <style>
 html,
 body {
-  font-family: monospace;
-  font-weight: bold;
+  font-family: 'Fira Code VF' monospace;
+  /* font-weight: bold; */
 }
 </style>
