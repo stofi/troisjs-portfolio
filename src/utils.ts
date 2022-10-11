@@ -15,9 +15,14 @@ export const map = (
 }
 
 let seed = 0
+let secretSeed = 0
 
 export const seedRandom = (s: number) => {
-  seed = s
+  seed = s + secretSeed
+}
+
+export const setSecretSeed = (s: number) => {
+  secretSeed = s
 }
 
 export const random = () => {

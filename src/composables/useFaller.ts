@@ -36,6 +36,24 @@ export default function <Item extends FallerItem>(props: {
     z: 40,
   })
 
+  store.onShuffle = () => {
+    if (!started.value) return
+
+    objects.value.forEach((object) => {
+      const x = random() * bounds.x - bounds.x / 2
+      // const y = random() * bounds.y - bounds.y / 2
+      const z = random() * bounds.z - bounds.z / 2
+
+      gsap.to(object.position, {
+        x,
+        // y,
+        z,
+        duration: 2,
+        ease: 'power2.inOut',
+      })
+    })
+  }
+
   const handleResize = () => {
     const aspect = window.innerWidth / window.innerHeight
     bounds.x = 40 * aspect

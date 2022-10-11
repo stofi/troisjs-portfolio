@@ -23,7 +23,13 @@ interface Store {
   pages: Pages
   deactivatePage: () => Promise<void>
   setPageActive: (name: PageName) => Promise<void>
+  resetDetails: () => void
+  onResetDetails?: () => void
+  shuffle: () => void
+  onShuffle?: () => void
 }
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // { x: Math.PI / 2 + (23.4 / 180) * Math.PI }
 const store = reactive<Store>({
@@ -46,14 +52,19 @@ const store = reactive<Store>({
     if (!activePage) return
     // deactivate current page
     activePage.active = false
+    await delay(500)
   },
   async setPageActive(name) {
-    console.log('setPageActive', name)
-
     // find new page
     const newPage = store.pages[name]
     // activate new page
     newPage.active = true
+  },
+  resetDetails() {
+    store.onResetDetails && store.onResetDetails()
+  },
+  shuffle() {
+    store.onShuffle && store.onShuffle()
   },
 })
 

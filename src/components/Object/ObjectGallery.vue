@@ -118,16 +118,16 @@ watch(
       options.globalYRotation = -Math.PI / 2
 
       gsap.to(options, {
-        globalYRotation: 0,
+        // globalYRotation: 0,
         opacity: 1,
-        duration: 10,
-        ease: 'power4.out',
+        duration: 1,
+        ease: 'power4.in',
       })
     } else if (!active && wasActive) {
       gsap.to(options, {
-        globalYRotation: Math.PI / 2,
+        // globalYRotation: Math.PI / 2,
         opacity: 0,
-        duration: 10,
+        duration: 1,
         ease: 'power4.out',
         onComplete: () => {
           options.globalYRotation = 0
@@ -207,6 +207,19 @@ interface ClickQueueEntry {
 
 const clickQueue = ref<ClickQueueEntry[]>([])
 const store = useStore()
+
+store.onResetDetails = () => {
+  if (started.value) return
+
+  gsap.to(galleryPosition.value, {
+    x: 0,
+    y: 0,
+    z: 0,
+    duration: 1,
+    ease: 'power4.out',
+  })
+  toggle()
+}
 
 const onClick = (object: GalleryItem, event: ClickEvent) => {
   if (!props.active) return

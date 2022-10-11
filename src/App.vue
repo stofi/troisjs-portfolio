@@ -21,10 +21,16 @@
   >
     <div id="teleport-header" class="row-start-1 row-end-2 p-2 col-span-full">
       <button
-        class="p-3 transition-opacity border-2 rounded-full opacity-50 pointer-events-auto hover:opacity-100 backdrop-blur-sm border-white/40"
-        @click="router.push('/')"
+        class="p-3 transition-opacity rounded-full opacity-50 pointer-events-auto hover:opacity-100"
+        @click="goHome"
       >
         <HomeIcon class="w-10 h-10 text-white/80" />
+      </button>
+      <button
+        class="p-3 transition-opacity rounded-full opacity-50 pointer-events-auto hover:opacity-100"
+        @click="store.shuffle"
+      >
+        <ArrowPathIcon class="w-10 h-10 text-white/80" />
       </button>
 
       <div v-for="text in store.texts" :key="text">
@@ -53,18 +59,25 @@
 </template>
 
 <script lang="ts" setup>
-import { onActivated, onErrorCaptured, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { nextTick, onActivated, onErrorCaptured, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-import { CheckCircleIcon, HomeIcon } from '@heroicons/vue/24/outline'
+import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  HomeIcon,
+} from '@heroicons/vue/24/outline'
 import { useDeviceOrientation } from '@vueuse/core'
 
 import AppRenderer from '@/components/App/AppRenderer.vue'
 import useStore from '@/composables/useStore'
+import { setSecretSeed } from '@/utils'
 
 interface DeviceOrientationEventiOS extends DeviceOrientationEvent {
   requestPermission?: () => Promise<'granted' | 'denied'>
 }
+
+const store = useStore()
 
 const requestPermissionResponse = ref<'granted' | 'denied'>('denied')
 
@@ -87,12 +100,23 @@ async function requestPermission() {
   showOverlay.value = false
 }
 const router = useRouter()
+const route = useRoute()
+
+const goHome = async () => {
+  if (route.path === '/') {
+    store.resetDetails()
+
+    return
+  }
+
+  await store.deactivatePage()
+  router.push('/')
+  await store.setPageActive('home')
+}
 
 onErrorCaptured((error) => {
   router.push('/')
 })
-
-const store = useStore()
 </script>
 
 <style>

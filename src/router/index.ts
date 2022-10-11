@@ -23,20 +23,20 @@ const configureRouter = () => {
     ],
   })
 
-  router.beforeEach(async (to, from) => {
-    console.log('router.beforeEach', to, from)
-    await store.deactivatePage()
-  })
+  // router.beforeEach(async (to, from) => {
+  //   console.log('router.beforeEach', to, from)
+  //   // await store.deactivatePage()
+  // })
 
-  router.afterEach(async (to, from) => {
-    console.log('router.afterEach', to, from)
+  // router.afterEach(async (to, from) => {
+  //   console.log('router.afterEach', to, from)
 
-    if (to.name === 'Home') {
-      store.setPageActive('home')
-    } else if (to.name === 'Gallery') {
-      store.setPageActive('gallery')
-    }
-  })
+  //   if (to.name === 'Home') {
+  //     store.setPageActive('home')
+  //   } else if (to.name === 'Gallery') {
+  //     store.setPageActive('gallery')
+  //   }
+  // })
 
   return router
 }

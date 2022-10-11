@@ -50,17 +50,21 @@ const concatGalleryFiles: GenericItem[] = galleryFiles.map((file) => ({
   name: file.attributes.title,
 }))
 
-const onClick = (object: GalleryItem) => {
+const onClick = async (object: GalleryItem) => {
   const { src } = object
 
   if (object.detail) {
     const index = concatGalleryFiles.findIndex((item) => item.src === src)
+    await store.deactivatePage()
+    await store.setPageActive('gallery')
+
     router.push(`/gallery/${index}`)
+    object.detail = false
   }
 }
 
 const gallery = reactive({
-  seed: 3,
+  seed: 15,
   scale: 1.2,
   speed: 0.5,
   images: concatGalleryFiles,
