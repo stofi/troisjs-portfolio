@@ -8,10 +8,8 @@
           :position="object.position"
         >
           <Plane
-            :width="object.scale * (object.aspect > 1 ? 0.8 : 1)"
-            :height="
-              object.scale * object.aspect * (object.aspect > 1 ? 0.8 : 1)
-            "
+            :width="fitImage(object.aspect)"
+            :height="object.aspect * fitImage(object.aspect)"
             :width-segments="1"
             :height-segments="1"
             @click="onClick(object, $event)"
@@ -31,15 +29,8 @@
           </Plane>
           <Group
             :position="{
-              x: -(object.scale * (object.aspect > 1 ? 0.8 : 1)) / 2 + 0.5,
-              y:
-                -(
-                  object.scale *
-                  object.aspect *
-                  (object.aspect > 1 ? 0.8 : 1)
-                ) /
-                  2 -
-                0.5,
+              x: -fitImage(object.aspect) / 2 + 0.5,
+              y: -(object.aspect * fitImage(object.aspect)) / 2 - 0.5,
               z: 0.01,
             }"
           >
@@ -69,6 +60,7 @@
 
 <script lang="ts" setup>
 import {
+  computed,
   defineEmits,
   defineProps,
   onActivated,
@@ -79,6 +71,7 @@ import {
 } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { useWindowSize } from '@vueuse/core'
 import gsap from 'gsap'
 import { CanvasTexture as CT, Vector3 } from 'three'
 import { BasicMaterial, Group, PhysicalMaterial, Plane, Texture } from 'troisjs'
@@ -93,7 +86,6 @@ export interface GalleryItem {
   rotation: Vector3
   aspect: number
   src: string
-  scale: number
   speed: number
   opacity: number
   color: string
@@ -171,6 +163,21 @@ const paintTexture = (text: string) => {
 
   return new CT(canvas)
 }
+const windowSize = useWindowSize()
+
+const screenAspect = computed(() => {
+  return windowSize.height.value / windowSize.width.value
+})
+
+const fitImage = (aspect: number, scale = 20) => {
+  const s = screenAspect.value > 1 ? scale / screenAspect.value : scale
+
+  return aspect > 1
+    ? // landscape
+      s / aspect
+    : // portrait
+      s
+}
 
 const mapImagesFromGallery = (images: string[] | GenericItem[]) => {
   return images.map(async (image) => {
@@ -192,7 +199,6 @@ const mapImagesFromGallery = (images: string[] | GenericItem[]) => {
       position: new Vector3(0, 0, 0),
       src: gi.src,
       aspect,
-      scale: 16 * props.scale,
       speed: 0.5,
       opacity: 0.1,
       color: randomHexColor(),
