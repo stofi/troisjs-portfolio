@@ -9,7 +9,6 @@ import useScene from '@/composables/useScene'
 import useStore from '@/composables/useStore'
 
 const renderer = ref<THREE.WebGLRenderer>()
-const controls = ref<OrbitControls>()
 const scene = ref<THREE.Scene>()
 const camera = ref<THREE.PerspectiveCamera>()
 const composer = ref<EC.EffectComposer>()
@@ -26,7 +25,6 @@ export default function useRenderer() {
     const rendererComponent = rendererRef.value
     if (!rendererComponent) return
     renderer.value = rendererComponent.renderer as THREE.WebGLRenderer
-    controls.value = rendererComponent.three.cameraCtrl as OrbitControls
     camera.value = rendererComponent.three.camera as THREE.PerspectiveCamera
     composer.value = rendererComponent.three.composer as EC.EffectComposer
     scene.value = rendererComponent.scene as THREE.Scene
@@ -41,7 +39,6 @@ export default function useRenderer() {
     sceneRef,
     enableEffect,
     renderer,
-    controls,
     camera,
     composer,
     target,

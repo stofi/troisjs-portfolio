@@ -80,6 +80,7 @@
     </div>
   </div>
   <AppModal
+    v-if="orientationSupported"
     v-bind="orientationModal"
     @click:primary="requestPermission"
     @click:secondary="orientationModal.open = false"
@@ -106,7 +107,6 @@ import {
   CogIcon,
   HomeIcon,
 } from '@heroicons/vue/24/outline'
-import { useDeviceOrientation } from '@vueuse/core'
 
 import type { AppModalType } from '@/components/App/AppModal.vue'
 import AppModal from '@/components/App/AppModal.vue'
@@ -115,20 +115,18 @@ import useStore from '@/composables/useStore'
 import { setSecretSeed } from '@/utils'
 
 interface DeviceOrientationEventiOS extends DeviceOrientationEvent {
-  requestPermission?: () => Promise<'granted' | 'denied'>
+  requestPermission?: () => Promise<'granted' | 'denied' | 'prompt'>
 }
 
 const store = useStore()
 
-const requestPermissionResponse = ref<'granted' | 'denied'>('denied')
-
-requestPermission()
+const orientationPermission = ref<'granted' | 'denied' | 'prompt'>('prompt')
 
 const orientationModal = reactive<{
   open: boolean
   type: AppModalType
 }>({
-  open: true,
+  open: false,
   type: {
     type: 'info',
     title: 'Enable gyro?',
@@ -138,21 +136,15 @@ const orientationModal = reactive<{
   },
 })
 
+const orientationSupported = ref(false)
+
 const fn = (DeviceOrientationEvent as unknown as DeviceOrientationEventiOS)
   .requestPermission
 const iOS = typeof fn === 'function'
 
 async function requestPermission() {
   if (iOS) {
-    const response = await fn()
-    requestPermissionResponse.value = response
-
-    if (response === 'granted') {
-      // execute
-
-      // showOverlay.value = false
-      orientationModal.open = false
-    }
+    orientationPermission.value = await fn()
   }
   orientationModal.open = false
 }
@@ -176,6 +168,19 @@ onErrorCaptured((error) => {
 })
 
 onMounted(async () => {
+  // device orientation support
+  if (window.DeviceOrientationEvent) {
+    orientationSupported.value = true
+
+    if (iOS) {
+      orientationPermission.value = await fn()
+
+      if (orientationPermission.value === 'prompt') {
+        orientationModal.open = true
+      }
+    }
+  }
+
   if (route.name === 'home') {
     await store.setPageActive('home')
   } else if (route.name === 'Gallery') {

@@ -55,9 +55,9 @@ const concatGalleryFiles: GenericItem[] = galleryFiles.map((file, i) => ({
 const onClick = async (object: GalleryItem) => {
   const { src } = object
 
-  if (object.detail) {
-    alert('detail')
-  }
+  // if (object.detail) {
+  //   alert('detail')
+  // }
 }
 const active = computed(() => store.pages.home.active)
 

@@ -1,30 +1,16 @@
 <template>
   <!-- 3D -->
-  <Renderer
-    ref="rendererRef"
-    alpha
-    resize="window"
-    antialias
-    :orbit-ctrl="{
-      enableDamping: true,
-      dampingFactor: 0.05,
-      enableRotate: false,
-      enablePan: false,
-      enableZoom: false,
-    }"
-  >
-    <Camera
-      ref="cameraRef"
-      :far="200"
-      :near="10"
-      :position="{ x: 0, y: 0, z: 50 }"
-    />
-
+  <Renderer ref="rendererRef" alpha resize="window" antialias>
     <Scene ref="sceneRef">
-      <DirectionalLight :position="{ x: 20, y: 20, z: 60 }" :intensity="1" />
+      <Group>
+        <Camera ref="cameraRef" :far="200" :near="10" />
+      </Group>
 
-      <Group :rotation="sceneTilt">
-        <slot></slot>
+      <Group :position="{ x: 0, y: 0, z: 0 }" :rotation="sceneTilt">
+        <DirectionalLight :position="{ x: 20, y: 20, z: 60 }" :intensity="1" />
+        <Group :position="{ x: 0, y: 0, z: -50 }">
+          <slot></slot>
+        </Group>
       </Group>
     </Scene>
     <EffectComposer>
@@ -63,7 +49,7 @@ const currentDirection = ref<Quaternion | null>(null)
 const { isAbsolute, alpha, beta, gamma } = useDeviceOrientation()
 
 const store = useStore()
-const tiltStrength = 0.08
+const tiltStrength = 0.04
 const { rendererRef, sceneRef, enableEffect } = useRenderer()
 const sceneTilt = ref<Vector3>(new Vector3(0, 0, 0))
 
