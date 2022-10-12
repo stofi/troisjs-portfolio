@@ -42,12 +42,12 @@ export default function <Item extends FallerItem>(props: {
     objects.value.forEach((object) => {
       const x = random() * bounds.x - bounds.x / 2
       // const y = random() * bounds.y - bounds.y / 2
-      const z = random() * bounds.z - bounds.z / 2
+      // const z = random() * bounds.z - bounds.z / 2
 
       gsap.to(object.position, {
         x,
         // y,
-        z,
+        // z,
         duration: 2,
         ease: 'power2.inOut',
       })

@@ -64,6 +64,7 @@ import {
   defineEmits,
   defineProps,
   onActivated,
+  onBeforeUnmount,
   onMounted,
   reactive,
   ref,
@@ -248,6 +249,134 @@ const onClick = (object: GalleryItem, event: ClickEvent) => {
   clickQueue.value.push({ object, event })
 }
 
+const enterDetail = (object: GalleryItem) => {
+  currentObject.value = object
+  object.detail = true
+  store.showArrowLeft = true
+  store.showArrowRight = true
+
+  if (object.path) {
+    store.showLink = true
+
+    store.onClickLink = () => {
+      router.push(object.path)
+
+      store.showLink = false
+
+      store.onClickLink = () => {
+        // router.push(object.path)
+      }
+    }
+  }
+  const screenAspect = window.innerWidth / window.innerHeight
+
+  let zOffset = 30
+
+  // change offset based on screen and object aspect
+  if (screenAspect > 1) {
+    // screen landscape
+    if (object.aspect < 1) {
+      // object landscape
+      zOffset = 30
+    } else {
+      // object portrait
+      zOffset = 20
+    }
+  } else {
+    // screen portrait
+    if (object.aspect < 1) {
+      // object landscape
+      zOffset = 20
+    } else {
+      // object portrait
+      zOffset = 20
+    }
+  }
+
+  gsap.to(galleryPosition.value, {
+    x: -object.position.x,
+    y: -object.position.y,
+    z: -object.position.z + zOffset,
+    duration: 1,
+    ease: 'power4.out',
+  })
+  const z = object.position.z
+
+  objects.value.forEach((o) => {
+    o.detail = false
+
+    gsap.to(o, {
+      opacity: 0,
+      duration: 1,
+      ease: 'power4.out',
+    })
+  })
+
+  gsap.to(object, {
+    opacity: 1,
+    duration: 1,
+    ease: 'power4.out',
+  })
+
+  gsap.to(object.position, {
+    z,
+    duration: 1,
+    ease: 'power4.out',
+  })
+}
+
+const exitDetail = () => {
+  if (currentObject.value) {
+    currentObject.value = null
+  }
+  store.showLink = false
+  store.showArrowLeft = false
+  store.showArrowRight = false
+
+  store.onClickLink = () => {
+    //
+  }
+
+  gsap.to(galleryPosition.value, {
+    x: 0,
+    y: 0,
+    z: 0,
+    duration: 1,
+    ease: 'power4.out',
+  })
+}
+
+const getRelativeIndex = (object: GalleryItem, relativeIndex: number) => {
+  const index = objects.value.findIndex((o) => o.id === object.id)
+  const newIndex = (index + relativeIndex) % objects.value.length
+
+  return objects.value[newIndex]
+}
+
+const currentObject = ref<GalleryItem | null>(null)
+
+const move = (relativeIndex: number) => {
+  const object = currentObject.value
+
+  if (!object) return
+
+  const nextObject = getRelativeIndex(object, relativeIndex)
+  enterDetail(nextObject)
+}
+
+const handleObjectClick = (object: GalleryItem) => {
+  emits('click', object)
+  if (!props.enableDetail) return
+
+  if (started.value) {
+    enterDetail(object)
+  } else {
+    exitDetail()
+  }
+
+  toggle()
+}
+
 store.rendererComponent?.onBeforeRender(() => {
   // if (!props.active) return
 
@@ -264,102 +393,31 @@ store.rendererComponent?.onBeforeRender(() => {
       { object: clickQueue.value[0].object, event: clickQueue.value[0].event }
     )
     clickQueue.value = []
-
-    emits('click', object)
-    if (!props.enableDetail) return
-
-    if (started.value) {
-      object.detail = true
-
-      if (object.path) {
-        store.showArrowRight = true
-
-        store.onClickRight = () => {
-          router.push(object.path)
-
-          store.showArrowRight = false
-
-          store.onClickRight = () => {
-            // router.push(object.path)
-          }
-        }
-      }
-      const screenAspect = window.innerWidth / window.innerHeight
-
-      let zOffset = 30
-
-      // change offset based on screen and object aspect
-      if (screenAspect > 1) {
-        // screen landscape
-        if (object.aspect < 1) {
-          // object landscape
-          zOffset = 30
-        } else {
-          // object portrait
-          zOffset = 20
-        }
-      } else {
-        // screen portrait
-        if (object.aspect < 1) {
-          // object landscape
-          zOffset = 20
-        } else {
-          // object portrait
-          zOffset = 20
-        }
-      }
-
-      gsap.to(galleryPosition.value, {
-        x: -object.position.x,
-        y: -object.position.y,
-        z: -object.position.z + zOffset,
-        duration: 1,
-        ease: 'power4.out',
-      })
-      const z = object.position.z
-
-      objects.value.forEach((o) => {
-        o.detail = false
-
-        gsap.to(o, {
-          opacity: 0,
-          duration: 1,
-          ease: 'power4.out',
-        })
-      })
-
-      gsap.to(object, {
-        opacity: 1,
-        duration: 1,
-        ease: 'power4.out',
-      })
-
-      gsap.to(object.position, {
-        z,
-        duration: 1,
-        ease: 'power4.out',
-      })
-    } else {
-      store.showArrowRight = false
-
-      store.onClickRight = () => {
-        //
-      }
-
-      gsap.to(galleryPosition.value, {
-        x: 0,
-        y: 0,
-        z: 0,
-        duration: 1,
-        ease: 'power4.out',
-      })
-    }
-
-    toggle()
+    handleObjectClick(object)
   }
 })
 
 onMounted(() => {
   generateObjects(items)
+
+  store.onClickLeft = () => {
+    move(-1)
+  }
+
+  store.onClickRight = () => {
+    move(1)
+  }
+})
+
+onBeforeUnmount(() => {
+  store.onClickLeft = () => {
+    //
+  }
+
+  store.onClickRight = () => {
+    //
+  }
+  store.showArrowLeft = false
+  store.showArrowRight = false
 })
 </script>

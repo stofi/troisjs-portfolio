@@ -56,6 +56,12 @@ const sceneTilt = ref<Vector3>(new Vector3(0, 0, 0))
 const onBeforeRender = () => {
   const renderer = rendererRef.value
   if (!renderer) return
+
+  if (!store.enableSceneTilt) {
+    sceneTilt.value.set(0, 0, 0)
+
+    return
+  }
   const normalizedPointer = renderer.three.pointer.positionN as Vector2
   sceneTilt.value.x = normalizedPointer.y * -tiltStrength
   sceneTilt.value.y = normalizedPointer.x * tiltStrength

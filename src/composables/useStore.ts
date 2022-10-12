@@ -21,6 +21,7 @@ interface Store {
   renderer?: WebGLRenderer
   rendererComponent?: ComponentPublicInstance<typeof Renderer>
   pages: Pages
+  enableSceneTilt: boolean
   deactivatePage: () => Promise<void>
   setPageActive: (name: PageName) => Promise<void>
   resetDetails: () => void
@@ -29,8 +30,10 @@ interface Store {
   onShuffle?: () => void
   showArrowLeft: boolean
   showArrowRight: boolean
+  showLink: boolean
   onClickLeft: () => void
   onClickRight: () => void
+  onClickLink: () => void
 }
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -50,6 +53,7 @@ const store = reactive<Store>({
       rotation: new Vector3(0, 0, 0),
     },
   },
+  enableSceneTilt: false,
   async deactivatePage() {
     // find current active page
     const activePage = Object.values(store.pages).find((page) => page.active)
@@ -72,10 +76,14 @@ const store = reactive<Store>({
   },
   showArrowLeft: false,
   showArrowRight: false,
+  showLink: false,
   onClickLeft() {
     //
   },
   onClickRight() {
+    //
+  },
+  onClickLink() {
     //
   },
 })

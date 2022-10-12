@@ -22,19 +22,19 @@
         class="p-3 transition-opacity rounded-full opacity-50 pointer-events-auto hover:opacity-100"
         @click="goHome"
       >
-        <HomeIcon class="w-10 h-10 text-white/80" />
+        <HomeIcon class="h-7 w-7 text-white/80" />
       </button>
       <button
         class="p-3 transition-opacity rounded-full opacity-50 pointer-events-auto hover:opacity-100"
         @click="store.shuffle"
       >
-        <ArrowPathIcon class="w-10 h-10 text-white/80" />
+        <ArrowPathIcon class="h-7 w-7 text-white/80" />
       </button>
       <button
         class="p-3 ml-auto transition-opacity rounded-full opacity-50 pointer-events-auto hover:opacity-100"
         @click="orientationModal.open = true"
       >
-        <CogIcon class="w-10 h-10 text-white/80" />
+        <CogIcon class="h-7 w-7 text-white/80" />
       </button>
     </div>
     <div
@@ -60,7 +60,18 @@
         "
         @click="store.onClickLeft"
       >
-        <ArrowLeftIcon class="w-10 h-10 text-white/80" />
+        <ArrowLeftIcon class="h-7 w-7 text-white/80" />
+      </button>
+      <button
+        class="p-3 mx-auto transition-opacity rounded-full"
+        :class="
+          store.showLink
+            ? 'pointer-events-auto opacity-50 hover:opacity-100'
+            : 'opacity-0 pointer-events-none hover:opacity-0'
+        "
+        @click="store.onClickLink"
+      >
+        <RectangleGroupIcon class="h-7 w-7 text-white/80" />
       </button>
       <button
         class="p-3 ml-auto transition-opacity rounded-full"
@@ -71,7 +82,7 @@
         "
         @click="store.onClickRight"
       >
-        <ArrowRightIcon class="w-10 h-10 text-white/80" />
+        <ArrowRightIcon class="h-7 w-7 text-white/80" />
       </button>
 
       <div v-for="text in store.texts" :key="text">
@@ -83,7 +94,7 @@
     v-if="orientationSupported"
     v-bind="orientationModal"
     @click:primary="requestPermission"
-    @click:secondary="orientationModal.open = false"
+    @click:secondary="disableGyroscope"
     @click:overlay="orientationModal.open = false"
   />
 </template>
@@ -106,6 +117,7 @@ import {
   CheckCircleIcon,
   CogIcon,
   HomeIcon,
+  RectangleGroupIcon,
 } from '@heroicons/vue/24/outline'
 
 import type { AppModalType } from '@/components/App/AppModal.vue'
@@ -132,7 +144,7 @@ const orientationModal = reactive<{
     title: 'Enable gyro?',
     message: `Do you want to enable device orientation? It's not required, so feel no pressure.`,
     secondary: 'No',
-    primary: 'OK',
+    primary: 'Yes',
   },
 })
 
@@ -147,6 +159,13 @@ async function requestPermission() {
     orientationPermission.value = await fn()
   }
   orientationModal.open = false
+  store.enableSceneTilt = true
+}
+
+const disableGyroscope = () => {
+  orientationPermission.value = 'denied'
+  orientationModal.open = false
+  store.enableSceneTilt = false
 }
 const router = useRouter()
 const route = useRoute()
