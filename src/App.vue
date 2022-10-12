@@ -9,17 +9,15 @@
     </AppRenderer>
   </Suspense>
 
-  <button
-    v-if="requestPermissionResponse !== 'granted' && showOverlay"
-    class="absolute inset-0"
-    @click="requestPermission"
-  ></button>
   <!-- UI -->
   <div
     id="ui"
     class="absolute inset-0 grid grid-cols-12 grid-rows-6 overflow-hidden pointer-events-none"
   >
-    <div id="teleport-header" class="row-start-1 row-end-2 p-2 col-span-full">
+    <div
+      id="teleport-header"
+      class="flex items-start row-start-1 row-end-2 p-2 col-span-full"
+    >
       <button
         class="p-3 transition-opacity rounded-full opacity-50 pointer-events-auto hover:opacity-100"
         @click="goHome"
@@ -32,10 +30,12 @@
       >
         <ArrowPathIcon class="w-10 h-10 text-white/80" />
       </button>
-
-      <div v-for="text in store.texts" :key="text">
-        {{ text }}
-      </div>
+      <button
+        class="p-3 ml-auto transition-opacity rounded-full opacity-50 pointer-events-auto hover:opacity-100"
+        @click="orientationModal.open = true"
+      >
+        <CogIcon class="w-10 h-10 text-white/80" />
+      </button>
     </div>
     <div
       id="teleport-left"
@@ -79,6 +79,12 @@
       </div>
     </div>
   </div>
+  <AppModal
+    v-bind="orientationModal"
+    @click:primary="requestPermission"
+    @click:secondary="orientationModal.open = false"
+    @click:overlay="orientationModal.open = false"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -97,10 +103,13 @@ import {
   ArrowPathIcon,
   ArrowRightIcon,
   CheckCircleIcon,
+  CogIcon,
   HomeIcon,
 } from '@heroicons/vue/24/outline'
 import { useDeviceOrientation } from '@vueuse/core'
 
+import type { AppModalType } from '@/components/App/AppModal.vue'
+import AppModal from '@/components/App/AppModal.vue'
 import AppRenderer from '@/components/App/AppRenderer.vue'
 import useStore from '@/composables/useStore'
 import { setSecretSeed } from '@/utils'
@@ -113,23 +122,39 @@ const store = useStore()
 
 const requestPermissionResponse = ref<'granted' | 'denied'>('denied')
 
-const showOverlay = ref(true)
 requestPermission()
 
-async function requestPermission() {
-  const fn = (DeviceOrientationEvent as unknown as DeviceOrientationEventiOS)
-    .requestPermission
-  const iOS = typeof fn === 'function'
+const orientationModal = reactive<{
+  open: boolean
+  type: AppModalType
+}>({
+  open: true,
+  type: {
+    type: 'info',
+    title: 'Enable gyro?',
+    message: `Do you want to enable device orientation? It's not required, so feel no pressure.`,
+    secondary: 'No',
+    primary: 'OK',
+  },
+})
 
+const fn = (DeviceOrientationEvent as unknown as DeviceOrientationEventiOS)
+  .requestPermission
+const iOS = typeof fn === 'function'
+
+async function requestPermission() {
   if (iOS) {
     const response = await fn()
     requestPermissionResponse.value = response
 
     if (response === 'granted') {
       // execute
+
+      // showOverlay.value = false
+      orientationModal.open = false
     }
   }
-  showOverlay.value = false
+  orientationModal.open = false
 }
 const router = useRouter()
 const route = useRoute()
